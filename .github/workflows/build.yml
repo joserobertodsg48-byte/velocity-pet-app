@@ -2,7 +2,8 @@ name: Build Android AAB
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -21,15 +22,20 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew || true
+    - name: Accept Android SDK Licenses
+      run: yes | sdkmanager --licenses || true
 
     - name: Build App Bundle (AAB)
-      run: ./gradlew bundleRelease
-
+      run: |
+        chmod +x ./gradlew || echo "Gradlew local não encontrado, usando gradle padrão"
+        if [ -f "./gradlew" ]; then
+          ./gradlew bundleRelease
+        else
+          gradle bundleRelease
+        fi
+    
     - name: Upload AAB Artifact
       uses: actions/upload-artifact@v4
       with:
         name: app-release-aab
         path: app/build/outputs/bundle/release/app-release.aab
-        
