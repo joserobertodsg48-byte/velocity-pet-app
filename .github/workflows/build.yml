@@ -21,19 +21,19 @@ jobs:
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
-
-    - name: Accept Android SDK Licenses
-      run: yes | sdkmanager --licenses || true
+      with:
+        api-level: 34
+        build-tools-version: '34.0.0'
 
     - name: Build App Bundle (AAB)
       run: |
-        chmod +x ./gradlew || echo "Gradlew local não encontrado, usando gradle padrão"
+        chmod +x ./gradlew || true
         if [ -f "./gradlew" ]; then
           ./gradlew bundleRelease
         else
           gradle bundleRelease
         fi
-    
+
     - name: Upload AAB Artifact
       uses: actions/upload-artifact@v4
       with:
